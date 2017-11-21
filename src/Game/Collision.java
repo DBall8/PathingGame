@@ -29,7 +29,7 @@ public class Collision {
 	// get the new x position 
 	public float getNewX(float x, float xvol){
 		if(t > T_EPSILON){
-			return (float) x + xvol*(t - T_EPSILON);
+			return  x + xvol*(t - T_EPSILON);
 		}
 		else{
 			return x;
@@ -39,7 +39,7 @@ public class Collision {
 	// get the new y position
 	public float getNewY(float y, float yvol){
 		if(t > T_EPSILON){
-			return (float) y + yvol* (t - T_EPSILON);
+			return y + yvol* (t - T_EPSILON);
 		}
 		else{
 			return y;

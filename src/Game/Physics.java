@@ -5,6 +5,15 @@ public class Physics {
 	static Collision tempC = new Collision();
 	final static float T_EPSILON = 0.005f;
 	
+	public static int min(int n1, int n2){
+		if(n1 < n2){
+			return n1;
+		}
+		else {
+			return n2;
+		}
+	}
+	
 	public static float getDistance(float x1, float y1, float x2, float y2){
 		float xdist = x1 - x2;
 		float ydist = y1 - y2;
@@ -12,31 +21,31 @@ public class Physics {
 	}
 	
 	// checks if a player will collide with the side of the window during the given time step
-    public static void CheckBoundaryCollision(float x, float y, float width, float height, float xvol, float yvol, float time, Collision c)
+    public static void checkBoundaryCollision(float x, float y, float width, float height, float xvol, float yvol, float time, Collision c)
     {
         // for each wall, find the first collision with that wall and save it if its an earlier collision than
         // any found so far
 
         // left
-        CheckVerticalCollision(x, width / 2, xvol, 0, time);
+        checkVerticalCollision(x, width / 2, xvol, 0, time);
         if (tempC.t <= c.t)
         {
             c.copy(tempC);
         }
         // right
-        CheckVerticalCollision(x, width / 2, xvol, MainWindow.DIMS.width, time);
+        checkVerticalCollision(x, width / 2, xvol, MainWindow.DIMS.width, time);
         if (tempC.t <= c.t)
         {
             c.copy(tempC);
         }
         // up
-        CheckHorizontalCollision(y, height / 2, yvol, 0, time);
+        checkHorizontalCollision(y, height / 2, yvol, 0, time);
         if (tempC.t <= c.t)
         {
             c.copy(tempC);
         }
         // down
-        CheckHorizontalCollision(y, height / 2, yvol, MainWindow.DIMS.height, time);
+        checkHorizontalCollision(y, height / 2, yvol, MainWindow.DIMS.height, time);
         if (tempC.t <= c.t)
         {
             c.copy(tempC);
@@ -44,7 +53,7 @@ public class Physics {
     }
 
     // checks collisions with a vertical line
-    public static void CheckVerticalCollision(float x, float radius, float xvol, float linex, float time)
+    public static void checkVerticalCollision(float x, float radius, float xvol, float linex, float time)
     {
         // reset temporary collision holder
         tempC.reset();
@@ -77,7 +86,7 @@ public class Physics {
     }
 
     // checks collisions with a horizontal line, see above for commenting as its the same code for different axis
-    public static void CheckHorizontalCollision(float y, float radius, float yvol, float liney, float time)
+    public static void checkHorizontalCollision(float y, float radius, float yvol, float liney, float time)
     {
         tempC.reset();
         if (yvol == 0)

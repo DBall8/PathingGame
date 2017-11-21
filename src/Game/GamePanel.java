@@ -16,9 +16,10 @@ import javax.swing.InputMap;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+
 public class GamePanel extends JPanel {
 	
-	public final static int UPDATE_RATE = 60;
+	public final static int UPDATE_RATE = 30;
 	private static final float EPSILON_TIME = 1e-3f; // 0.01
 
 	private static final long serialVersionUID = 1L;
@@ -28,11 +29,14 @@ public class GamePanel extends JPanel {
 	
 	private Player p1;
 	
+	public static final Map map = new Map();
+	
 	private boolean paused = false;
 	
 	private InputMap inputMap;
 	private ActionMap actionMap;
 	
+	private Character[] characters;
 
 	public GamePanel(MainWindow parent) {
 		this.parent = parent;
@@ -42,11 +46,16 @@ public class GamePanel extends JPanel {
 		// listener for clicks
 		addMouseListener(new ClickListener());
 		
+		characters = new Character[2];
+		
 		p1 = new Player(100, 100);
+		characters[0] = p1;
 		
 		KeyPressHandler p1keys = new KeyPressHandler();
 		p1.setKeys(p1keys);
 		this.addKeyListener(p1keys);
+		
+		characters[1] = new Enemy(p1, 100, 100);
 		
 		inputMap = getInputMap(JPanel.WHEN_FOCUSED);
 		actionMap = getActionMap();
@@ -68,27 +77,59 @@ public class GamePanel extends JPanel {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawImage(bg, 0, 0, MainWindow.DIMS.width, MainWindow.DIMS.height, parent);
 		
-		p1.draw(g2);
+		for(Character c: characters){
+			c.draw(g2);
+		}
+
+		for(Obstacle o: map.getObs()){
+			if(o != null){
+				o.draw(g2);	
+			}
+			else{
+				break;
+			}
+			
+		}
 	}
 	
 	private void frameTick(){
 		float timeleft = 1.00f; // 100%
 		float earliestTime, tempTime;
 		
-		p1.update();
+		for(Character c: characters){
+			c.update();
+		}
 		
 		do{
-			p1.reset();
+			for(Character c: characters){
+				c.reset();
+			}
 			
 			earliestTime = timeleft;
-			tempTime = p1.CheckBoundaryCollision(timeleft);
-            if(tempTime < earliestTime)
-            {
-                earliestTime = tempTime;
-            }
+			
+			for(Character c: characters){
+				tempTime = c.CheckBoundaryCollision(timeleft);
+	            if(tempTime < earliestTime)
+	            {
+	                earliestTime = tempTime;
+	            }
+	            for(Obstacle o: map.getObs()){
+	            	if(o == null){
+	            		break;
+	            	}
+	            	tempTime = c.checkObstacleCollision(timeleft, o);
+	            	if(tempTime < earliestTime)
+		            {
+		                earliestTime = tempTime;
+		            }
+	            }
+			}
+			
+			for(Character c: characters){
+				c.move(earliestTime);
+			}
+			
 
-            // moves each player to their location at the time of the earliest collision
-            p1.move(earliestTime);
             // finds the remaining time
             timeleft -= earliestTime;
 		}while(timeleft > EPSILON_TIME);
